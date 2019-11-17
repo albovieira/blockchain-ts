@@ -3,12 +3,15 @@ import { ec as ECDSA, ec } from 'elliptic';
 //secp256k1 base algorith of bitcoint wallets
 const EC = new ECDSA('secp256k1');
 
-export function generateKey() {
+export function generateWallet() {
   const key = EC.genKeyPair();
   const publicKey = key.getPublic('hex');
   const privateKey = key.getPrivate('hex');
 
-  return { publicKey, privateKey };
+  return {
+    publicKey,
+    privateKey
+  };
 }
 
 export function getPublicKey(publicKey: string) {

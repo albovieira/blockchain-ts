@@ -8,10 +8,10 @@ export class BlockChain {
   private pendingTransactions: Transaction[] = [];
   private miningReward: number;
 
-  constructor() {
+  constructor(difficulty: number, miningReward: number) {
     this.chain = [this.createGenesisBlock()];
-    this.difficulty = 2; // it must be changed to set automactically when many people are tring to generate a new block
-    this.miningReward = 100; // same as above
+    this.difficulty = difficulty; // it must be changed to set automactically when many people are tring to generate a new block
+    this.miningReward = miningReward; // same as above
   }
 
   addTransaction(transaction: Transaction) {
@@ -25,17 +25,16 @@ export class BlockChain {
   }
 
   minePendingTransactions(miningRewardAddress: string) {
-    const rewardTx = new Transaction(
+    const reward = new Transaction(
       null,
       miningRewardAddress,
       this.miningReward
     );
-    this.pendingTransactions.push(rewardTx);
+    this.pendingTransactions.push(reward);
 
     const lastBlock = this.getLastestBlock();
     const block = new Block(this.pendingTransactions, lastBlock.hash);
     block.mining(this.difficulty);
-    console.log(`Block succesfuly mined ${block.hash}`);
     this.chain.push(block);
 
     this.pendingTransactions = [];
@@ -55,10 +54,6 @@ export class BlockChain {
     return balance;
   }
 
-  show() {
-    return cloneDeep(this.chain);
-  }
-
   isValid() {
     for (let index = 1; index < this.chain.length; index++) {
       const currentBlock = this.chain[index];
@@ -67,18 +62,20 @@ export class BlockChain {
       if (!currentBlock.hasValidTransactions()) {
         return false;
       }
-
       if (currentBlock.hash !== currentBlock.calculateHash()) {
         return false;
       }
       if (currentBlock.previousHash !== previousBlock.calculateHash()) {
         return false;
       }
-      console.log(`Blockchain is broken`);
     }
 
     console.log(`Blockchain is valid`);
     return true;
+  }
+
+  show() {
+    return cloneDeep(this.chain);
   }
 
   private createGenesisBlock() {
