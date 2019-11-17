@@ -1,22 +1,35 @@
+import {
+  generateKey,
+  getPrivateKey,
+  getPublicKeyFromPrivateKey as getPublicKeyFromPrivate
+} from './key-generator';
+
 import { BlockChain } from './blockchain';
 import { Transaction } from './transaction';
+
+const { privateKey, publicKey } = generateKey();
+console.log(`
+ PrivateKey: ${privateKey}, \n
+ PublicKey: ${publicKey},
+`);
+
+const myKey = getPrivateKey(privateKey);
+const myWalletAddress = getPublicKeyFromPrivate(privateKey);
 
 function main() {
   console.log('start');
   const blockchain = new BlockChain();
 
-  blockchain.createTransactions(new Transaction('address1', 'address2', 100));
-  blockchain.createTransactions(new Transaction('address2', 'address1', 50));
+  const tx1 = new Transaction(myWalletAddress, 'other key', 10);
+  tx1.signTransaction(myKey);
+  blockchain.addTransaction(tx1);
 
-  blockchain.minePendingTransactions('albo');
+  console.log('Starting miner...');
+  blockchain.minePendingTransactions(myWalletAddress);
 
-  console.log(`albo balance here will be 0 because reward is a pendng transcation
-  : ${blockchain.getWalletBalance('albo')}`);
+  console.log('Balance mywallet', blockchain.getWalletBalance(myWalletAddress));
 
-  blockchain.minePendingTransactions('albo');
-  console.log(`albo balance is: ${blockchain.getWalletBalance('albo')}`);
-
-  console.log('done');
+  console.log('is chain valid', blockchain.isValid());
 }
 
 main();

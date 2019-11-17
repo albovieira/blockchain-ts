@@ -14,19 +14,31 @@ export class BlockChain {
     this.miningReward = 100; // same as above
   }
 
-  createTransactions(transaction: Transaction) {
+  addTransaction(transaction: Transaction) {
+    if (!transaction.fromAddress || !transaction.toAddress)
+      throw new Error('Transactions must include from and to wallets');
+
+    if (!transaction.isValid())
+      throw new Error('Transactions must be valid to chain');
+
     this.pendingTransactions.push(transaction);
   }
 
   minePendingTransactions(miningRewardAddress: string) {
-    const block = new Block(this.pendingTransactions);
+    const rewardTx = new Transaction(
+      null,
+      miningRewardAddress,
+      this.miningReward
+    );
+    this.pendingTransactions.push(rewardTx);
+
+    const lastBlock = this.getLastestBlock();
+    const block = new Block(this.pendingTransactions, lastBlock.hash);
     block.mining(this.difficulty);
     console.log(`Block succesfuly mined ${block.hash}`);
     this.chain.push(block);
 
-    this.pendingTransactions = [
-      new Transaction(null, miningRewardAddress, this.miningReward)
-    ];
+    this.pendingTransactions = [];
   }
 
   getWalletBalance(address: string) {
@@ -49,15 +61,20 @@ export class BlockChain {
 
   isValid() {
     for (let index = 1; index < this.chain.length; index++) {
-      const block = this.chain[index];
+      const currentBlock = this.chain[index];
       const previousBlock = this.chain[index - 1];
-      if (block.hash !== block.calculateHash()) {
+
+      if (!currentBlock.hasValidTransactions()) {
         return false;
       }
-      if (block.previousHash !== previousBlock.hash) {
+
+      if (currentBlock.hash !== currentBlock.calculateHash()) {
         return false;
       }
-      console.error(`Blockchain is broken`);
+      if (currentBlock.previousHash !== previousBlock.calculateHash()) {
+        return false;
+      }
+      console.log(`Blockchain is broken`);
     }
 
     console.log(`Blockchain is valid`);
@@ -65,7 +82,8 @@ export class BlockChain {
   }
 
   private createGenesisBlock() {
-    const genesisBlock = new Block([{} as Transaction], '0', 0);
+    const genesisBlock = new Block([{} as Transaction], null, 0);
+    genesisBlock.hash = genesisBlock.calculateHash();
     console.log('First block created');
     return genesisBlock;
   }
