@@ -62,10 +62,10 @@ export class BlockChain {
       if (!currentBlock.hasValidTransactions()) {
         return false;
       }
-      if (currentBlock.hash !== currentBlock.calculateHash()) {
+      if (currentBlock.hash !== currentBlock.generateHash()) {
         return false;
       }
-      if (currentBlock.previousHash !== previousBlock.calculateHash()) {
+      if (currentBlock.previousHash !== previousBlock.generateHash()) {
         return false;
       }
     }
@@ -80,7 +80,7 @@ export class BlockChain {
 
   private createGenesisBlock() {
     const genesisBlock = new Block([{} as Transaction], null, 0);
-    genesisBlock.hash = genesisBlock.calculateHash();
+    genesisBlock.hash = genesisBlock.generateHash();
     console.log('First block created');
     return genesisBlock;
   }

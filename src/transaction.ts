@@ -1,7 +1,7 @@
 import { ec } from 'elliptic';
 import { SHA256 } from 'crypto-js';
 
-import { verifySignature, getPublicKey } from './key-generator';
+import { verifySignature, getPublicKey } from './wallet-generator';
 
 export class Transaction {
   fromAddress: string;
@@ -16,13 +16,13 @@ export class Transaction {
   }
 
   signTransaction(signKey: ec.KeyPair) {
-    //check if public key is corret
+    //check if public key is correct
     if (signKey.getPublic('hex') !== this.fromAddress) {
       throw new Error('You can not sign transactions for other wallet');
     }
 
-    // it signs the transactin with the private key
-    const hashTx = this.calculateHash();
+    // it signs the transaction with the private key
+    const hashTx = this.generateHash();
     const sig = signKey.sign(hashTx, 'base64');
     this.signature = sig.toDER('hex').toString();
   }
@@ -38,13 +38,13 @@ export class Transaction {
     const publickey = getPublicKey(this.fromAddress);
     const verified = verifySignature(
       publickey,
-      this.calculateHash(),
+      this.generateHash(),
       this.signature
     );
     return verified;
   }
 
-  private calculateHash() {
+  private generateHash() {
     return SHA256(
       `${this.fromAddress}${this.toAddress}${this.amount}`
     ).toString();

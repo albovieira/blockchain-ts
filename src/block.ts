@@ -18,11 +18,11 @@ export class Block {
     this.transactions = transactions;
     this.timestamp = Date.now();
     this.previousHash = previousHash || null;
-    this.hash = this.calculateHash();
+    this.hash = this.generateHash();
     this.nonce = 0; // used to avoid infinite loop on mining method, needed to change the hash
   }
 
-  calculateHash() {
+  generateHash() {
     return SHA256(
       `${this.index}${this.previousHash}${this.timestamp}${
         this.nonce
@@ -38,7 +38,7 @@ export class Block {
       this.hash.substring(0, difficulty) !== Array(difficulty + 1).join('0')
     ) {
       this.nonce++;
-      this.hash = this.calculateHash();
+      this.hash = this.generateHash();
     }
     console.log(`Block mined ${this.hash}`);
     return this;

@@ -2,7 +2,7 @@ import {
   generateWallet,
   getPrivateKey,
   getPublicKeyFromPrivateKey as getPublicKeyFromPrivate
-} from './key-generator';
+} from './wallet-generator';
 
 import { BlockChain } from './blockchain';
 import { Transaction } from './transaction';
