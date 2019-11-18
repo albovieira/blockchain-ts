@@ -1,20 +1,25 @@
-import {
-  generateWallet,
-  getPrivateKey,
-  getPublicKeyFromPrivateKey as getPublicKeyFromPrivate
-} from './wallet-generator';
-
 import { BlockChain } from './blockchain';
 import { Transaction } from './transaction';
+import { WalletGenerator } from './wallet-generator';
 
-const { privateKey: privateKey1, publicKey: publicKey1 } = generateWallet();
-const fromPrivateKey = getPrivateKey(privateKey1);
+const {
+  privateKey: privateKey1,
+  publicKey: publicKey1
+} = WalletGenerator.create();
+const fromPrivateKey = WalletGenerator.getPrivateKey(privateKey1);
 const from = publicKey1;
 
-const { privateKey: privateKey2, publicKey: publicKey2 } = generateWallet();
+const {
+  privateKey: privateKey2,
+  publicKey: publicKey2
+} = WalletGenerator.create();
 const to = publicKey2;
 
-const { privateKey: privateKey3, publicKey: publicKey3 } = generateWallet();
+const {
+  privateKey: privateKey3,
+  publicKey: publicKey3
+} = WalletGenerator.create();
+
 const rewardWallet = publicKey3;
 
 function main() {

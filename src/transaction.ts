@@ -1,7 +1,7 @@
 import { ec } from 'elliptic';
 import { SHA256 } from 'crypto-js';
 
-import { verifySignature, getPublicKey } from './wallet-generator';
+import { WalletGenerator } from './wallet-generator';
 
 export class Transaction {
   fromAddress: string;
@@ -35,8 +35,8 @@ export class Transaction {
       throw new Error('No signature in this transaction');
     }
 
-    const publickey = getPublicKey(this.fromAddress);
-    const verified = verifySignature(
+    const publickey = WalletGenerator.getPublicKey(this.fromAddress);
+    const verified = WalletGenerator.verifySignature(
       publickey,
       this.generateHash(),
       this.signature
