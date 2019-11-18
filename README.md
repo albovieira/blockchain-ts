@@ -13,8 +13,8 @@ Flow:
 Next steps:
 
 - Create a p2p network and share the blockchain between the nodes;
-- To add a consensus protocol;
-- To create smartcontracts and trigger then when the terms are reached.
+- Add a consensus protocol;
+- Create smartcontracts and trigger then when the terms are reached.
 
 ### Setup
 
