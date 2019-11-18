@@ -4,6 +4,7 @@ This project aims to implement a basic blockchain flow.
 Flow:
 
 - Creation of signed wallets;
+- Balance Check;
 - Every transaction is signed before be created in the blockchain;
 - There is a prof of work algorithm and a reward system to compensate the effort to generate the block hash;
 
