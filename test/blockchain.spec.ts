@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 
-import { BlockChain } from '../src/blockchain';
+import { BlockChain } from '../src/lib/blockchain';
+import { Transaction } from '../src/lib/transaction';
 import { createWallets } from './mocks/walletMocks';
-import { Transaction } from '../src/transaction';
 
 const DIFFICULTY = 2;
 const REWARD = 10;
@@ -29,14 +29,13 @@ describe('Blockchain', () => {
 
     const { sk: fromPrivateKey, pk: fromPublickKey } = wallets.from;
     blockchain.addRewardTransaction(fromPublickKey);
-    
+
     const { pk: toPublickKey } = wallets.to;
     const { pk: rewardPublickKey } = wallets.reward;
 
     const tx1 = new Transaction(fromPublickKey, toPublickKey, 5);
     tx1.sign(fromPrivateKey);
     blockchain.addTransaction(tx1);
-
 
     const tx2 = new Transaction(fromPublickKey, toPublickKey, 2);
     tx2.sign(fromPrivateKey);
@@ -45,9 +44,8 @@ describe('Blockchain', () => {
     const tx3 = new Transaction(fromPublickKey, toPublickKey, 1);
     tx3.sign(fromPrivateKey);
     blockchain.addTransaction(tx3);
-  
-    blockchain.minePendingTransactions(rewardPublickKey);
 
+    blockchain.minePendingTransactions(rewardPublickKey);
 
     expect(blockchain.getAddressBalance(fromPublickKey)).to.be.eq(2);
     expect(blockchain.getAddressBalance(toPublickKey)).to.be.eq(8);
@@ -60,16 +58,16 @@ describe('Blockchain', () => {
 
     const { sk: fromPrivateKey, pk: fromPublickKey } = wallets.from;
     blockchain.addRewardTransaction(fromPublickKey);
-    
+
     const { pk: toPublickKey } = wallets.to;
 
     const tx1 = new Transaction(fromPublickKey, toPublickKey, 11);
     tx1.sign(fromPrivateKey);
-    
+
     try {
       blockchain.addTransaction(tx1);
     } catch (error) {
-      expect(error.message).to.be.eq('Insuficient founds');      
+      expect(error.message).to.be.eq('Insuficient founds');
     }
   });
 
@@ -78,14 +76,14 @@ describe('Blockchain', () => {
 
     const { sk: fromPrivateKey, pk: fromPublickKey } = wallets.from;
     blockchain.addRewardTransaction(fromPublickKey);
-    
+
     const tx1 = new Transaction('invalidFrom', 'invalidTo', 5);
     try {
       tx1.sign(fromPrivateKey);
     } catch (error) {
-      expect(error.message).to.be.eq('You can not sign transactions for other wallet');      
+      expect(error.message).to.be.eq(
+        'You can not sign transactions for other wallet'
+      );
     }
   });
-
-
 });

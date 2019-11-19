@@ -1,4 +1,4 @@
-import { WalletGenerator } from '../../src/wallet-generator';
+import { WalletGenerator } from '../../src/lib/wallet-generator';
 
 export function createWallets() {
   const wallets = {};
