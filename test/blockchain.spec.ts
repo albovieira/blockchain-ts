@@ -4,17 +4,20 @@ import { BlockChain } from '../src/blockchain';
 import { createWallets } from './mocks/walletMocks';
 import { Transaction } from '../src/transaction';
 
+const DIFFICULTY = 2;
+const REWARD = 10;
+
 describe('Blockchain', () => {
   let blockchain: BlockChain;
 
   before(() => {
-    blockchain = new BlockChain(2, 10);
+    blockchain = new BlockChain(DIFFICULTY, REWARD);
   });
 
   it('should start wallet with a reward balance', () => {
     const wallets = createWallets() as any;
 
-    const { ak: fromPrivateKey, pk: fromPublickKey } = wallets.from;
+    const { pk: fromPublickKey } = wallets.from;
 
     blockchain.addRewardTransaction(fromPublickKey);
     const balance = blockchain.getWalletBalance(fromPublickKey);
