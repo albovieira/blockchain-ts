@@ -5,11 +5,11 @@ export function createWallets() {
   ['from', 'to', 'reward'].forEach(type => {
     const { privateKey, publicKey } = WalletGenerator.create();
 
-    const ak = WalletGenerator.getPrivateKey(privateKey);
+    const sk = WalletGenerator.getPrivateKey(privateKey);
     const pk = publicKey;
 
     wallets[type] = {
-      ak,
+      sk: sk,
       pk
     };
   });

@@ -27,7 +27,7 @@ describe('Blockchain', () => {
   it('should create transactions in blockchain', () => {
     const wallets = createWallets() as any;
 
-    const { ak: fromPrivateKey, pk: fromPublickKey } = wallets.from;
+    const { sk: fromPrivateKey, pk: fromPublickKey } = wallets.from;
     blockchain.addRewardTransaction(fromPublickKey);
     
     const { pk: toPublickKey } = wallets.to;
@@ -49,7 +49,7 @@ describe('Blockchain', () => {
   it('should throw an exception when insuficient founds', () => {
     const wallets = createWallets() as any;
 
-    const { ak: fromPrivateKey, pk: fromPublickKey } = wallets.from;
+    const { sk: fromPrivateKey, pk: fromPublickKey } = wallets.from;
     blockchain.addRewardTransaction(fromPublickKey);
     
     const { pk: toPublickKey } = wallets.to;
@@ -64,10 +64,10 @@ describe('Blockchain', () => {
     }
   });
 
-  it.only('should throw an exception for invalid wallets', () => {
+  it('should throw an exception for invalid wallets', () => {
     const wallets = createWallets() as any;
 
-    const { ak: fromPrivateKey, pk: fromPublickKey } = wallets.from;
+    const { sk: fromPrivateKey, pk: fromPublickKey } = wallets.from;
     blockchain.addRewardTransaction(fromPublickKey);
     
     const tx1 = new Transaction('invalidFrom', 'invalidTo', 5);
