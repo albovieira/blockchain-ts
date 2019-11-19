@@ -27,6 +27,7 @@ export class BlockChain {
     this.pendingTransactions.push(transaction);
   }
 
+  /** it adds balance for the first wallet that will moviment coins */
   startFirstWallet(wallet: string) {
     const lastBlock = this.getLastestBlock();
     if (lastBlock.index === 0) {
