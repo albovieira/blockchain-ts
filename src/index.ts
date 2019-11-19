@@ -24,9 +24,12 @@ const rewardWallet = publicKey3;
 
 function main() {
   console.log('start');
-  const blockchain = new BlockChain(2, 100);
+  const blockchain = new BlockChain(2, 10);
 
-  const tx1 = new Transaction(from, to, 10);
+  console.log('Start first wallet...');
+  blockchain.startFirstWallet(from);
+
+  const tx1 = new Transaction(from, to, 5);
   tx1.signTransaction(fromPrivateKey);
   blockchain.addTransaction(tx1);
 

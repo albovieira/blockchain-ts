@@ -15,6 +15,9 @@ export class BlockChain {
   }
 
   addTransaction(transaction: Transaction) {
+    if (this.getWalletBalance(transaction.fromAddress) < transaction.amount)
+      throw new Error('Invalid balance');
+
     if (!transaction.fromAddress || !transaction.toAddress)
       throw new Error('Transactions must include from and to wallets');
 
@@ -24,12 +27,15 @@ export class BlockChain {
     this.pendingTransactions.push(transaction);
   }
 
+  startFirstWallet(wallet: string) {
+    const lastBlock = this.getLastestBlock();
+    if (lastBlock.index === 0) {
+      this.minePendingTransactions(wallet);
+    }
+  }
+
   minePendingTransactions(miningRewardAddress: string) {
-    const reward = new Transaction(
-      null,
-      miningRewardAddress,
-      this.miningReward
-    );
+    const reward = this.createReward(miningRewardAddress, this.miningReward);
     this.pendingTransactions.push(reward);
 
     const lastBlock = this.getLastestBlock();
@@ -76,6 +82,10 @@ export class BlockChain {
 
   show() {
     return cloneDeep(this.chain);
+  }
+
+  private createReward(wallet: string, rewardValue: number) {
+    return new Transaction(null, wallet, rewardValue);
   }
 
   private createGenesisBlock() {
