@@ -10,7 +10,7 @@ const REWARD = 10;
 describe('Blockchain', () => {
   let blockchain: BlockChain;
 
-  before(() => {
+  beforeEach(() => {
     blockchain = new BlockChain(DIFFICULTY, REWARD);
   });
 
