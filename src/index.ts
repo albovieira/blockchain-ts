@@ -27,7 +27,7 @@ function main() {
   const blockchain = new BlockChain(2, 10);
 
   console.log('Start first wallet...');
-  blockchain.startFirstWallet(from);
+  blockchain.addRewardTransaction(from);
 
   const tx1 = new Transaction(from, to, 5);
   tx1.signTransaction(fromPrivateKey);

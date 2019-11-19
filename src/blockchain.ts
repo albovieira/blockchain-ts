@@ -27,12 +27,9 @@ export class BlockChain {
     this.pendingTransactions.push(transaction);
   }
 
-  /** it adds balance for the first wallet that will moviment coins */
-  startFirstWallet(wallet: string) {
-    const lastBlock = this.getLastestBlock();
-    if (lastBlock.index === 0) {
-      this.minePendingTransactions(wallet);
-    }
+  /** it adds reward for firsts wallets */
+  addRewardTransaction(wallet: string) {
+    this.minePendingTransactions(wallet);
   }
 
   minePendingTransactions(miningRewardAddress: string) {
