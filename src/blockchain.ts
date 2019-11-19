@@ -14,8 +14,8 @@ export class BlockChain {
     this.miningReward = miningReward; // same as above
   }
 
-  addTransaction(transaction: Transaction) {
-    if (this.getWalletBalance(transaction.fromAddress) < transaction.amount)
+  addTransaction(transaction: Transaction): BlockChain {
+    if (this.getAddressBalance(transaction.fromAddress) < transaction.amount)
       throw new Error('Insuficient founds');
 
     if (!transaction.fromAddress || !transaction.toAddress)
@@ -25,14 +25,17 @@ export class BlockChain {
       throw new Error('Transactions must be valid to chain');
 
     this.pendingTransactions.push(transaction);
+
+    return this;
   }
 
   /** it adds reward for firsts wallets */
-  addRewardTransaction(wallet: string) {
+  addRewardTransaction(wallet: string): BlockChain {
     this.minePendingTransactions(wallet);
+    return this;
   }
 
-  minePendingTransactions(miningRewardAddress: string) {
+  minePendingTransactions(miningRewardAddress: string): BlockChain {
     const reward = this.createReward(miningRewardAddress, this.miningReward);
     this.pendingTransactions.push(reward);
 
@@ -41,10 +44,13 @@ export class BlockChain {
     block.mining(this.difficulty);
     this.chain.push(block);
 
+    console.log('Transactions done');
     this.pendingTransactions = [];
+
+    return this;
   }
 
-  getWalletBalance(address: string) {
+  getAddressBalance(address: string): number {
     let balance = 0;
     for (const block of this.chain) {
       for (const transaction of block.transactions) {
@@ -58,7 +64,7 @@ export class BlockChain {
     return balance;
   }
 
-  isValid() {
+  isValid(): boolean {
     for (let index = 1; index < this.chain.length; index++) {
       const currentBlock = this.chain[index];
       const previousBlock = this.chain[index - 1];
@@ -78,15 +84,15 @@ export class BlockChain {
     return true;
   }
 
-  show() {
+  show(): Block[] {
     return cloneDeep(this.chain);
   }
 
-  private createReward(wallet: string, rewardValue: number) {
-    return new Transaction(null, wallet, rewardValue);
+  private createReward(address: string, rewardValue: number): Transaction {
+    return new Transaction(null, address, rewardValue);
   }
 
-  private createGenesisBlock() {
+  private createGenesisBlock(): Block {
     const genesisBlock = new Block([{} as Transaction], null, 0);
     genesisBlock.hash = genesisBlock.generateHash();
     console.log('First block created');

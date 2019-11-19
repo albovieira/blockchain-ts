@@ -30,17 +30,17 @@ function main() {
   blockchain.addRewardTransaction(from);
 
   const tx1 = new Transaction(from, to, 5);
-  tx1.signTransaction(fromPrivateKey);
+  tx1.sign(fromPrivateKey);
   blockchain.addTransaction(tx1);
 
   console.log('Starting miner...');
   blockchain.minePendingTransactions(rewardWallet);
 
-  console.log('Balance from', blockchain.getWalletBalance(from));
-  console.log('Balance to', blockchain.getWalletBalance(to));
+  console.log('Balance from', blockchain.getAddressBalance(from));
+  console.log('Balance to', blockchain.getAddressBalance(to));
   console.log(
     'Balance reward wallet',
-    blockchain.getWalletBalance(rewardWallet)
+    blockchain.getAddressBalance(rewardWallet)
   );
 
   console.log('is chain valid', blockchain.isValid());

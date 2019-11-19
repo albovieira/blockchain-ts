@@ -2,7 +2,7 @@ import { ec as ECDSA } from 'elliptic';
 
 //secp256k1 base algorith of bitcoint wallets
 const EC = new ECDSA('secp256k1');
-//secp256k1 base algorith of bitcoint wallets
+
 export class WalletGenerator {
   static create() {
     const key = EC.genKeyPair();

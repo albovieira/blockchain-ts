@@ -22,18 +22,10 @@ export class Block {
     this.nonce = 0; // used to avoid infinite loop on mining method, needed to change the hash
   }
 
-  generateHash() {
-    return SHA256(
-      `${this.index}${this.previousHash}${this.timestamp}${
-        this.nonce
-      }${JSON.stringify(this.transactions)}`
-    ).toString();
-  }
-
   /**this method is used as a prof of work, according with difficulty
    * it will try to generate a hash that has the amount of 0 specified
    */
-  mining(difficulty: number) {
+  mining(difficulty: number): Block {
     while (
       this.hash.substring(0, difficulty) !== Array(difficulty + 1).join('0')
     ) {
@@ -44,12 +36,20 @@ export class Block {
     return this;
   }
 
-  hasValidTransactions() {
+  hasValidTransactions(): boolean {
     for (const transaction of this.transactions) {
       if (!transaction.isValid()) {
         return false;
       }
     }
     return true;
+  }
+
+  generateHash(): string {
+    return SHA256(
+      `${this.index}${this.previousHash}${this.timestamp}${
+        this.nonce
+      }${JSON.stringify(this.transactions)}`
+    ).toString();
   }
 }

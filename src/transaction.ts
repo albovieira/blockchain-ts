@@ -15,7 +15,7 @@ export class Transaction {
     this.amount = amount;
   }
 
-  signTransaction(signKey: ec.KeyPair) {
+  sign(signKey: ec.KeyPair): void {
     //check if public key is correct
     if (signKey.getPublic('hex') !== this.fromAddress) {
       throw new Error('You can not sign transactions for other wallet');
@@ -27,7 +27,7 @@ export class Transaction {
     this.signature = sig.toDER('hex').toString();
   }
 
-  isValid() {
+  isValid(): boolean {
     // from should be null if the transaction is a reward
     if (this.fromAddress === null) return true;
 
@@ -44,7 +44,7 @@ export class Transaction {
     return verified;
   }
 
-  private generateHash() {
+  private generateHash(): string {
     return SHA256(
       `${this.fromAddress}${this.toAddress}${this.amount}`
     ).toString();

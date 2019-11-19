@@ -20,7 +20,7 @@ describe('Blockchain', () => {
     const { pk: fromPublickKey } = wallets.from;
 
     blockchain.addRewardTransaction(fromPublickKey);
-    const balance = blockchain.getWalletBalance(fromPublickKey);
+    const balance = blockchain.getAddressBalance(fromPublickKey);
     expect(balance).to.be.eq(10);
   });
 
@@ -34,15 +34,24 @@ describe('Blockchain', () => {
     const { pk: rewardPublickKey } = wallets.reward;
 
     const tx1 = new Transaction(fromPublickKey, toPublickKey, 5);
-    tx1.signTransaction(fromPrivateKey);
+    tx1.sign(fromPrivateKey);
     blockchain.addTransaction(tx1);
+
+
+    const tx2 = new Transaction(fromPublickKey, toPublickKey, 2);
+    tx2.sign(fromPrivateKey);
+    blockchain.addTransaction(tx2);
+
+    const tx3 = new Transaction(fromPublickKey, toPublickKey, 1);
+    tx3.sign(fromPrivateKey);
+    blockchain.addTransaction(tx3);
   
     blockchain.minePendingTransactions(rewardPublickKey);
 
 
-    expect(blockchain.getWalletBalance(fromPublickKey)).to.be.eq(5);
-    expect(blockchain.getWalletBalance(toPublickKey)).to.be.eq(5);
-    expect(blockchain.getWalletBalance(rewardPublickKey)).to.be.eq(10);
+    expect(blockchain.getAddressBalance(fromPublickKey)).to.be.eq(2);
+    expect(blockchain.getAddressBalance(toPublickKey)).to.be.eq(8);
+    expect(blockchain.getAddressBalance(rewardPublickKey)).to.be.eq(10);
     expect(blockchain.isValid()).to.be.eq(true);
   });
 
@@ -55,7 +64,7 @@ describe('Blockchain', () => {
     const { pk: toPublickKey } = wallets.to;
 
     const tx1 = new Transaction(fromPublickKey, toPublickKey, 11);
-    tx1.signTransaction(fromPrivateKey);
+    tx1.sign(fromPrivateKey);
     
     try {
       blockchain.addTransaction(tx1);
@@ -72,7 +81,7 @@ describe('Blockchain', () => {
     
     const tx1 = new Transaction('invalidFrom', 'invalidTo', 5);
     try {
-      tx1.signTransaction(fromPrivateKey);
+      tx1.sign(fromPrivateKey);
     } catch (error) {
       expect(error.message).to.be.eq('You can not sign transactions for other wallet');      
     }
