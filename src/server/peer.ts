@@ -1,7 +1,8 @@
 import * as net from 'net';
 
 export class Peer {
-  private server;
+  private connections: net.Socket[];
+
   constructor(port: number) {
     const server = net
       .createServer(socket => {
@@ -23,7 +24,18 @@ export class Peer {
     });
   }
 
-  onSocketConnected(socket: any) {
-    console.log('New connection');
+  onSocketConnected(socket: net.Socket) {
+    this.connections.push(socket);
+    socket.on('data', data => this.onData(socket, data));
+
+    this.onConnection(socket);
+  }
+
+  onData(socket: net.Socket, data: any) {
+    console.log(`Data received: ${data.toString}`);
+  }
+
+  onConnection(socket: net.Socket) {
+    socket.write('opa ne q deu');
   }
 }
