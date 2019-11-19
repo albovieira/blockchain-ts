@@ -16,7 +16,7 @@ export class BlockChain {
 
   addTransaction(transaction: Transaction) {
     if (this.getWalletBalance(transaction.fromAddress) < transaction.amount)
-      throw new Error('Invalid balance');
+      throw new Error('Insuficient founds');
 
     if (!transaction.fromAddress || !transaction.toAddress)
       throw new Error('Transactions must include from and to wallets');
