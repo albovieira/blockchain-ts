@@ -1,10 +1,12 @@
 import * as net from 'net';
 
 export class Peer {
-  private connections: net.Socket[];
+  private signature: string;
+  private connections: net.Socket[] = [];
+  private receivedMessages: any[] = [];
 
-  constructor(port: number) {
-    const server = net
+  constructor(port: number, signature: string) {
+    net
       .createServer(socket => {
         this.onSocketConnected(socket);
       })
@@ -32,10 +34,33 @@ export class Peer {
   }
 
   onData(socket: net.Socket, data: any) {
-    console.log(`Data received: ${data.toString}`);
+    const json = data.toString();
+    const payload = JSON.parse(json);
+
+    // if the message is from this node or already received ignore
+    if (
+      this.signature === payload.signature ||
+      this.receivedMessages.includes(payload.signature)
+    )
+      return;
+
+    // change it to a map to keep the content with the hash
+    this.receivedMessages.push(payload.signature);
+    console.log(`Data received: ${payload.message}`);
+    this.broadcast(json);
   }
 
   onConnection(socket: net.Socket) {
-    socket.write('opa ne q deu');
+    socket.write(
+      JSON.stringify({
+        signature: this.signature,
+        payload: { message: 'All peers hearing' }
+      })
+    );
+  }
+
+  broadcast(data: any) {
+    this.connections.forEach(con => con.write(data));
+    console.log(`Data broadcasted`);
   }
 }
