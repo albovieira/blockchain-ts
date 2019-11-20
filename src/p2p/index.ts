@@ -14,6 +14,9 @@ function createSignature() {
   return signature;
 }
 
+// Ill implement a socket that will send a signal when a new machine was started and wanna to
+// enter in the peer network
+/** After up one peer, all others peers that will be connected must be in this array */
 const peer = new Peer(port, createSignature());
 
 /** After up one peer, all others peers that will be connected must be in this array */
