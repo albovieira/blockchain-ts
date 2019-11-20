@@ -6,6 +6,7 @@ export class Peer {
   private receivedMessages: any[] = [];
 
   constructor(port: number, signature: string) {
+    this.signature = signature;
     net
       .createServer(socket => {
         this.onSocketConnected(socket);
@@ -46,7 +47,7 @@ export class Peer {
 
     // change it to a map to keep the content with the hash
     this.receivedMessages.push(payload.signature);
-    console.log(`Data received: ${payload.message}`);
+    console.log(`Data received: ${JSON.stringify(payload)}`);
     this.broadcast(json);
   }
 
@@ -61,6 +62,6 @@ export class Peer {
 
   broadcast(data: any) {
     this.connections.forEach(con => con.write(data));
-    console.log(`Data broadcasted`);
+    console.log(`Data broadcasted, ${JSON.stringify(data)}`);
   }
 }

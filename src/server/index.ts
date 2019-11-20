@@ -7,11 +7,13 @@ config();
 
 const port = Number(process.env.PORT) || 3000;
 
-const timestamp = Date.now();
-const randomIndex = Math.floor(Math.random() * 100000);
-const peerSignature = SHA256(`${port}-${timestamp}-${randomIndex}`).toString();
-
-const peer = new Peer(port, peerSignature);
+function createSignature() {
+  const timestamp = Date.now();
+  const randomIndex = Math.floor(Math.random() * 100000);
+  const signature = SHA256(`${port}-${timestamp}-${randomIndex}`).toString();
+  return signature;
+}
+const peer = new Peer(port, createSignature());
 
 // const peers = ['localhost:3002'];
 // peers.forEach(host => {
