@@ -48,7 +48,6 @@ export class Peer {
     // change it to a map to keep the content with the hash
     this.receivedMessages.push(payload.signature);
     console.log(`Data received: ${JSON.stringify(payload)}`);
-    this.broadcast(json);
   }
 
   onConnection(socket: net.Socket) {
@@ -61,6 +60,7 @@ export class Peer {
   }
 
   broadcast(data: any) {
+    console.log(this.connections);
     this.connections.forEach(con => con.write(data));
     console.log(`Data broadcasted, ${JSON.stringify(data)}`);
   }
