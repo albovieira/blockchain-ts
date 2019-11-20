@@ -13,6 +13,13 @@ function createSignature() {
   const signature = SHA256(`${port}-${timestamp}-${randomIndex}`).toString();
   return signature;
 }
+
 const peer = new Peer(port, createSignature());
+
+/** After up one peer, all others peers that will be connected must be in this array */
+// const peers = ['localhost:3000'];
+// peers.forEach(host => {
+//   peer.connectTo(host);
+// });
 
 export default peer;

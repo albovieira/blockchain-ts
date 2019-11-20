@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "rm dist -rf && tsc && node ./dist/server/index.js",
+    "start": "rm dist -rf && tsc && node ./dist/p2p/index.js",
     "test": "mocha -r ts-node/register test/**/*.spec.ts"
   },
   "author": "Albo Vieira",
