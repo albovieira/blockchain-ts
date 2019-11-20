@@ -30,6 +30,9 @@ export class Peer {
   onSocketConnected(socket: net.Socket) {
     this.connections.push(socket);
     socket.on('data', data => this.onData(socket, data));
+    socket.on('close', () => {
+      this.connections = this.connections.filter(conn => conn !== socket);
+    });
 
     this.onConnection(socket);
   }
