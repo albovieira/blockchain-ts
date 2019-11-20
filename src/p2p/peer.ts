@@ -1,72 +1,26 @@
 import * as net from 'net';
-import { Socket } from 'socket.io';
+import { SignalSocket } from './signal-socket';
 
 export class Peer {
   private signature: string;
   private connections: net.Socket[] = [];
   private receivedMessages: any[] = [];
-  private hostsConnected = [];
+  private signalSocket: SignalSocket;
 
   constructor(port: number, signature: string, signalSocket: any) {
     this.signature = signature;
-    this.hostsConnected = [{ signature, socketId: 1 }];
+    this.signalSocket = new SignalSocket(signalSocket);
+
     net
       .createServer(socket => {
         this.onSocketConnected(socket);
       })
       .listen(port, () => {
         if (signalSocket.isCentralNode) {
-          //it should be refactored to use separate signnal socket of server socket
-          signalSocket.io.on('connection', (socket: Socket) => {
-            socket.on('message', signature => {
-              console.log(`signature from signal socket ${signature}`);
-
-              const foundPeer = this.hostsConnected.find(
-                h => h.signature === signature
-              );
-
-              if (!foundPeer) {
-                this.hostsConnected.push({ signature, socketId: socket.id });
-                signalSocket.io.sockets.emit(
-                  'UPDATE_HOSTS',
-                  this.hostsConnected
-                );
-                console.log(
-                  `Hosts connected ${JSON.stringify(this.hostsConnected)}`
-                );
-              }
-            });
-            socket.on('disconnect', () => {
-              const id = socket.client.id;
-
-              const peerDisconnected = this.hostsConnected.find(
-                h => h.socketId === id
-              );
-              if (peerDisconnected) {
-                this.hostsConnected = this.hostsConnected.filter(
-                  h => h.socketId !== id
-                );
-                signalSocket.io.sockets.emit(
-                  'UPDATE_HOSTS',
-                  this.hostsConnected
-                );
-                console.log(`signal socket closed for ${id}`);
-              }
-              console.log(`peer disconnected`);
-            });
-          });
+          this.signalSocket.server(this.signature);
         } else {
-          signalSocket.io.on('connect', () => {
-            //client host signature sent to server
-            signalSocket.io.send(this.signature);
-
-            signalSocket.io.on('UPDATE_HOSTS', msg => {
-              console.log(`getting broadcast message: ${JSON.stringify(msg)}`);
-              this.hostsConnected = msg;
-            });
-          });
+          this.signalSocket.client(this.signature);
         }
-
         console.log(`Listening on port ${port}`);
       });
   }
