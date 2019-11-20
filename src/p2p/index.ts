@@ -24,7 +24,7 @@ let io;
 if(isCentralNode) {
   io = require('socket.io')(socketIOPort);
 } else {
-  io.connect(`http://localhost:${socketIOPort}`)
+  io = require('socket.io-client')(`http://localhost:${socketIOPort}`);
 }
 
 
