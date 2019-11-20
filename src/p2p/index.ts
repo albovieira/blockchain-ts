@@ -6,6 +6,7 @@ import { Peer } from './peer';
 config();
 
 const port = Number(process.env.PORT) || 3000;
+const socketIOPort = Number(process.env.WEB_SOCKET_PORT) || 80;
 
 function createSignature() {
   const timestamp = Date.now();
@@ -14,10 +15,10 @@ function createSignature() {
   return signature;
 }
 
-// Ill implement a socket that will send a signal when a new machine was started and wanna to
-// enter in the peer network
-/** After up one peer, all others peers that will be connected must be in this array */
-const peer = new Peer(port, createSignature());
+const signature = createSignature();
+
+const io = require('socket.io')(socketIOPort);
+const peer = new Peer(port, signature, io);
 
 /** After up one peer, all others peers that will be connected must be in this array */
 // const peers = ['localhost:3000'];

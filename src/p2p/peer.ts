@@ -5,13 +5,26 @@ export class Peer {
   private connections: net.Socket[] = [];
   private receivedMessages: any[] = [];
 
-  constructor(port: number, signature: string) {
+  constructor(port: number, signature: string, io:any) {
     this.signature = signature;
     net
       .createServer(socket => {
         this.onSocketConnected(socket);
       })
       .listen(port, () => {
+
+        io.on('connection', (socket) =>  {
+          console.log('signal socket on');
+          socket.on('message', (data) => { console.log('data from signal socket', JSON.stringify(data)) });
+          socket.on('disconnect', () => { console.log('signal socket closed') });
+          
+          const peerInfo = {
+            connections: this.connections,
+            signature: this.signature,
+          }
+          socket.broadcast.emit(JSON.stringify(peerInfo));
+        });
+        
         console.log(`Listening on port ${port}`);
       });
   }
