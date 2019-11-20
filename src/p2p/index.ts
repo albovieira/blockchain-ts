@@ -21,19 +21,12 @@ const signature = createSignature();
 // just for tests one of the peers will be the socket server
 const isCentralNode = process.env.CENTRAL_NODE === 'true';
 let io;
-if(isCentralNode) {
+if (isCentralNode) {
   io = require('socket.io')(socketIOPort);
 } else {
   io = require('socket.io-client')(`http://localhost:${socketIOPort}`);
 }
 
-
-const peer = new Peer(port, signature, { io, isCentralNode});
-
-/** After up one peer, all others peers that will be connected must be in this array */
-// const peers = ['localhost:3000'];
-// peers.forEach(host => {
-//   peer.connectTo(host);
-// });
+const peer = new Peer(port, signature, { io, isCentralNode });
 
 export default peer;

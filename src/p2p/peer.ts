@@ -1,38 +1,68 @@
 import * as net from 'net';
+import { Socket } from 'socket.io';
 
 export class Peer {
   private signature: string;
   private connections: net.Socket[] = [];
   private receivedMessages: any[] = [];
+  private hostsConnected = [];
 
-  constructor(port: number, signature: string, signalSocket:any) {
+  constructor(port: number, signature: string, signalSocket: any) {
     this.signature = signature;
+    this.hostsConnected = [{ signature, socketId: 1 }];
     net
       .createServer(socket => {
         this.onSocketConnected(socket);
       })
       .listen(port, () => {
-        if(signalSocket.isCentralNode) {
-          signalSocket.io.on('connection', (socket) =>  {
-            console.log('signal socket on');
-            socket.on('message', (data) => { console.log('data from signal socket', JSON.stringify(data)) });
-            socket.on('disconnect', () => { console.log('signal socket closed') });
-            
-            const peerInfo = {
-              connections: this.connections,
-              signature: this.signature,
-            }
-            socket.broadcast.emit(JSON.stringify(peerInfo));
-          });
-        }
+        if (signalSocket.isCentralNode) {
+          //it should be refactored to use separate signnal socket of server socket
+          signalSocket.io.on('connection', (socket: Socket) => {
+            socket.on('message', signature => {
+              console.log(`signature from signal socket ${signature}`);
 
-        else {
+              const foundPeer = this.hostsConnected.find(
+                h => h.signature === signature
+              );
+
+              if (!foundPeer) {
+                this.hostsConnected.push({ signature, socketId: socket.id });
+                signalSocket.io.sockets.emit(
+                  'UPDATE_HOSTS',
+                  this.hostsConnected
+                );
+                console.log(
+                  `Hosts connected ${JSON.stringify(this.hostsConnected)}`
+                );
+              }
+            });
+            socket.on('disconnect', () => {
+              const id = socket.client.id;
+
+              const peerDisconnected = this.hostsConnected.find(
+                h => h.socketId === id
+              );
+              if (peerDisconnected) {
+                this.hostsConnected = this.hostsConnected.filter(
+                  h => h.socketId !== id
+                );
+                signalSocket.io.sockets.emit(
+                  'UPDATE_HOSTS',
+                  this.hostsConnected
+                );
+                console.log(`signal socket closed for ${id}`);
+              }
+              console.log(`peer disconnected`);
+            });
+          });
+        } else {
           signalSocket.io.on('connect', () => {
-            console.log('client connected');
-            signalSocket.io.send('hi');
-        
-            signalSocket.io.on('message', (msg) => {
-              console.log('teste');
+            //client host signature sent to server
+            signalSocket.io.send(this.signature);
+
+            signalSocket.io.on('UPDATE_HOSTS', msg => {
+              console.log(`getting broadcast message: ${JSON.stringify(msg)}`);
+              this.hostsConnected = msg;
             });
           });
         }
