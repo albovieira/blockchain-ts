@@ -5,26 +5,38 @@ export class Peer {
   private connections: net.Socket[] = [];
   private receivedMessages: any[] = [];
 
-  constructor(port: number, signature: string, io:any) {
+  constructor(port: number, signature: string, signalSocket:any) {
     this.signature = signature;
     net
       .createServer(socket => {
         this.onSocketConnected(socket);
       })
       .listen(port, () => {
+        if(signalSocket.isCentralNode) {
+          signalSocket.io.on('connection', (socket) =>  {
+            console.log('signal socket on');
+            socket.on('message', (data) => { console.log('data from signal socket', JSON.stringify(data)) });
+            socket.on('disconnect', () => { console.log('signal socket closed') });
+            
+            const peerInfo = {
+              connections: this.connections,
+              signature: this.signature,
+            }
+            socket.broadcast.emit(JSON.stringify(peerInfo));
+          });
+        }
 
-        io.on('connection', (socket) =>  {
-          console.log('signal socket on');
-          socket.on('message', (data) => { console.log('data from signal socket', JSON.stringify(data)) });
-          socket.on('disconnect', () => { console.log('signal socket closed') });
-          
-          const peerInfo = {
-            connections: this.connections,
-            signature: this.signature,
-          }
-          socket.broadcast.emit(JSON.stringify(peerInfo));
-        });
+        else {
+          signalSocket.io.on('connect', () => {
+            console.log('client connected');
+            signalSocket.io.send('hi');
         
+            signalSocket.io.on('message', (msg) => {
+              console.log('teste');
+            });
+          });
+        }
+
         console.log(`Listening on port ${port}`);
       });
   }
