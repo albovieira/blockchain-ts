@@ -17,9 +17,9 @@ export class Peer {
       })
       .listen(port, () => {
         if (signalSocket.isCentralNode) {
-          this.signalSocket.server(this.signature);
+          this.signalSocket.server(this.signature, 'localhost', port);
         } else {
-          this.signalSocket.client(this.signature);
+          this.signalSocket.client(this.signature, this);
         }
         console.log(`Listening on port ${port}`);
       });

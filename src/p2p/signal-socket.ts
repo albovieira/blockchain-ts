@@ -1,4 +1,5 @@
 import { Socket } from 'socket.io';
+import { Peer } from './peer';
 
 export class SignalSocket {
   private signalSocket;
@@ -8,7 +9,7 @@ export class SignalSocket {
     this.signalSocket = signalSocket;
   }
 
-  server(serverSignature: string): void {
+  server(serverSignature: string, host: string, port: number): void {
     this.hostsConnected = [{ signature: serverSignature, socketId: 1 }];
 
     this.signalSocket.io.on('connection', (socket: Socket) => {
@@ -20,7 +21,12 @@ export class SignalSocket {
         );
 
         if (!foundPeer) {
-          this.hostsConnected.push({ signature, socketId: socket.id });
+          this.hostsConnected.push({
+            signature,
+            socketId: socket.id,
+            host,
+            port
+          });
           this.signalSocket.io.sockets.emit(
             'UPDATE_HOSTS',
             this.hostsConnected
@@ -49,7 +55,7 @@ export class SignalSocket {
     });
   }
 
-  client(signature: string): void {
+  client(signature: string, peer: Peer): void {
     this.signalSocket.io.on('connect', () => {
       //client host signature sent to server
       this.signalSocket.io.send(signature);
