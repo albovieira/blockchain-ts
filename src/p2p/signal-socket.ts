@@ -9,23 +9,34 @@ export class SignalSocket {
     this.signalSocket = signalSocket;
   }
 
-  server(serverSignature: string, host: string, port: number): void {
-    this.hostsConnected = [{ signature: serverSignature, socketId: 1 }];
+  server(
+    serverSignature: string,
+    serverHost: string,
+    serverPort: number
+  ): void {
+    this.hostsConnected = [
+      {
+        signature: serverSignature,
+        socketId: 1,
+        host: serverHost,
+        port: serverPort
+      }
+    ];
 
     this.signalSocket.io.on('connection', (socket: Socket) => {
-      socket.on('message', signature => {
-        console.log(`signature from signal socket ${signature}`);
+      socket.on('message', data => {
+        console.log(`signature from signal socket ${JSON.stringify(data)}`);
 
         const foundPeer = this.hostsConnected.find(
-          h => h.signature === signature
+          h => h.signature === data.signature
         );
 
         if (!foundPeer) {
           this.hostsConnected.push({
-            signature,
-            socketId: socket.id,
-            host,
-            port
+            signature: data.signature,
+            host: data.host,
+            port: data.port,
+            socketId: socket.id
           });
           this.signalSocket.io.sockets.emit(
             'UPDATE_HOSTS',
@@ -55,10 +66,10 @@ export class SignalSocket {
     });
   }
 
-  client(signature: string, peer: Peer): void {
+  client(signature: string, host: string, port: number, peer: Peer): void {
     this.signalSocket.io.on('connect', () => {
       //client host signature sent to server
-      this.signalSocket.io.send(signature);
+      this.signalSocket.io.send({ signature, host, port });
 
       this.signalSocket.io.on('UPDATE_HOSTS', msg => {
         console.log(`getting broadcast message: ${JSON.stringify(msg)}`);
