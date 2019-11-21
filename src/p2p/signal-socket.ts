@@ -74,6 +74,9 @@ export class SignalSocket {
       this.signalSocket.io.on('UPDATE_HOSTS', msg => {
         console.log(`getting broadcast message: ${JSON.stringify(msg)}`);
         this.hostsConnected = msg;
+        this.hostsConnected.forEach(machine => {
+          peer.connectTo(`${machine.host}:${machine.port}`);
+        });
       });
     });
   }
