@@ -56,6 +56,7 @@ export class Peer {
 
   onData(socket: net.Socket, data: any) {
     const json = data.toString();
+    console.log('DATA', json);
     const payload = JSON.parse(json);
 
     // if the message is from this node or already received ignore
@@ -77,10 +78,12 @@ export class Peer {
         payload: { message: 'Peer connected' }
       })
     );
+
+    const payload = this.blockchain.show();
     socket.write(
       JSON.stringify({
         signature: this.signature,
-        payload: this.blockchain.show()
+        payload
       })
     );
   }
