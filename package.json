@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "rm dist -rf && tsc && node ./dist/index.js",
+    "server": "rm dist -rf && tsc && node ./dist/full-node/index.js",
+    "client": "rm dist -rf && tsc && node ./dist/miner-node/index.js",
     "test": "mocha -r ts-node/register test/**/*.spec.ts"
   },
   "author": "Albo Vieira",

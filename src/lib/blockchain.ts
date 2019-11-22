@@ -8,10 +8,26 @@ export class BlockChain {
   private pendingTransactions: Transaction[] = [];
   private miningReward: number;
 
-  constructor(difficulty: number, miningReward: number) {
-    this.chain = [this.createGenesisBlock()];
-    this.difficulty = difficulty; // it must be changed to set automactically when many people are tring to generate a new block
-    this.miningReward = miningReward; // same as above
+  constructor(
+    isGenesis: boolean = false,
+    difficulty: number,
+    miningReward: number
+  ) {
+    if (isGenesis) {
+      this.chain = [this.createGenesisBlock()];
+      this.difficulty = difficulty; // it must be changed to set automactically when many people are tring to generate a new block
+      this.miningReward = miningReward; // same as above
+    }
+  }
+
+  rebuild(blocks: Block[]) {
+    // need to create some validations here
+    this.difficulty = 2;
+    this.miningReward = 10;
+    this.chain = blocks;
+    if (!this.isValid()) {
+      throw new Error('Invalid chain');
+    }
   }
 
   addTransaction(transaction: Transaction): BlockChain {
@@ -86,6 +102,13 @@ export class BlockChain {
 
   show(): Block[] {
     return cloneDeep(this.chain);
+  }
+
+  getConfig() {
+    return {
+      difficulty: this.difficulty,
+      miningReward: this.miningReward
+    };
   }
 
   private createReward(address: string, rewardValue: number): Transaction {
