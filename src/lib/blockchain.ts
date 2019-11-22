@@ -30,8 +30,8 @@ export class BlockChain {
   }
 
   /** it adds reward for firsts wallets */
-  addRewardTransaction(wallet: string): BlockChain {
-    this.minePendingTransactions(wallet);
+  addRewardTransaction(address: string): BlockChain {
+    this.minePendingTransactions(address);
     return this;
   }
 

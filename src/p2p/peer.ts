@@ -1,15 +1,24 @@
 import * as net from 'net';
 import { SignalSocket } from './signal-socket';
+import { BlockChain } from '../lib/blockchain';
+import { Block } from '../lib/block';
 
 export class Peer {
+  private blockchain: BlockChain;
   private signature: string;
   private connections: net.Socket[] = [];
   private receivedMessages: any[] = [];
   private signalSocket: SignalSocket;
 
-  constructor(port: number, signature: string, signalSocket: any) {
+  constructor(
+    blockchain: BlockChain,
+    port: number,
+    signature: string,
+    signalSocket: any
+  ) {
     this.signature = signature;
     this.signalSocket = new SignalSocket(signalSocket);
+    this.blockchain = blockchain;
 
     net
       .createServer(socket => {
@@ -42,7 +51,6 @@ export class Peer {
     socket.on('close', () => {
       this.connections = this.connections.filter(conn => conn !== socket);
     });
-
     this.onConnection(socket);
   }
 
@@ -66,7 +74,13 @@ export class Peer {
     socket.write(
       JSON.stringify({
         signature: this.signature,
-        payload: { message: 'All peers hearing' }
+        payload: { message: 'Peer connected' }
+      })
+    );
+    socket.write(
+      JSON.stringify({
+        signature: this.signature,
+        payload: this.blockchain.show()
       })
     );
   }

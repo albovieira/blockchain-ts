@@ -1,5 +1,7 @@
 import { Socket } from 'socket.io';
 import { Peer } from './peer';
+import { BlockChain } from '../lib/blockchain';
+import { Block } from '../lib/block';
 
 export class SignalSocket {
   private signalSocket;
