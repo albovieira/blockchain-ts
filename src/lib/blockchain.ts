@@ -25,7 +25,25 @@ export class BlockChain {
     console.log('rebuilding');
     this.difficulty = config.difficulty;
     this.miningReward = config.miningReward;
-    this.chain = blocks;
+    this.chain = blocks.map(bk => {
+      bk.transactions = bk.transactions.map(transaction => {
+        const tx = new Transaction(
+          transaction.fromAddress,
+          transaction.toAddress,
+          transaction.amount
+        );
+        tx.signature = transaction.signature;
+        return tx;
+      });
+
+      const block = new Block(bk.transactions);
+      block.hash = bk.hash;
+      block.timestamp = bk.timestamp;
+      block.nonce = bk.nonce;
+      block.previousHash = bk.previousHash;
+      return block;
+    });
+
     if (!this.isValid()) {
       throw new Error('Invalid chain');
     }

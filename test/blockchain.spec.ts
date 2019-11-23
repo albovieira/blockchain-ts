@@ -11,7 +11,7 @@ describe('Blockchain', () => {
   let blockchain: BlockChain;
 
   beforeEach(() => {
-    blockchain = new BlockChain(DIFFICULTY, REWARD);
+    blockchain = new BlockChain(true, DIFFICULTY, REWARD);
   });
 
   it('should start wallet with a reward balance', () => {

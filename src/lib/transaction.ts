@@ -15,6 +15,10 @@ export class Transaction {
     this.amount = amount;
   }
 
+  rebuild(signature: string) {
+    this.signature = signature;
+  }
+
   sign(signKey: ec.KeyPair): void {
     //check if public key is correct
     if (signKey.getPublic('hex') !== this.fromAddress) {
