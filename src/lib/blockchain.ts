@@ -48,6 +48,7 @@ export class BlockChain {
       throw new Error('Invalid chain');
     }
     console.log('blockchain rebuild');
+    return this;
   }
 
   addTransaction(transaction: Transaction): BlockChain {
