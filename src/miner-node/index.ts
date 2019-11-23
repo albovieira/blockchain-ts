@@ -18,7 +18,7 @@ const signature = createSignature(port);
 // just for tests one of the peers will be the socket server
 const io = getSignalSocket(socketIOPort, false);
 
-const blockchain = new BlockChain(false, 2, 10);
+const blockchain = new BlockChain(false, null, null);
 const peer = new Peer(blockchain, port, signature, {
   io,
   isCentralNode: false

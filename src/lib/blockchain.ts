@@ -20,14 +20,16 @@ export class BlockChain {
     }
   }
 
-  rebuild(blocks: Block[]) {
+  rebuild(blocks: Block[], config: any) {
     // need to create some validations here
-    this.difficulty = 2;
-    this.miningReward = 10;
+    console.log('rebuilding');
+    this.difficulty = config.difficulty;
+    this.miningReward = config.miningReward;
     this.chain = blocks;
     if (!this.isValid()) {
       throw new Error('Invalid chain');
     }
+    console.log('blockchain rebuild');
   }
 
   addTransaction(transaction: Transaction): BlockChain {

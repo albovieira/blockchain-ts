@@ -1,14 +1,18 @@
 import * as net from 'net';
 import { SignalSocket } from './signal-socket';
 import { BlockChain } from '../lib/blockchain';
-import { Block } from '../lib/block';
+
+enum Events {
+  START_BLOCKCHAIN = 'START_BLOCKCHAIN'
+}
 
 export class Peer {
   private blockchain: BlockChain;
   private signature: string;
   private connections: net.Socket[] = [];
-  private receivedMessages: any[] = [];
   private signalSocket: SignalSocket;
+  private isCentralNode: boolean;
+  private events = [];
 
   constructor(
     blockchain: BlockChain,
@@ -19,14 +23,16 @@ export class Peer {
     this.signature = signature;
     this.signalSocket = new SignalSocket(signalSocket);
     this.blockchain = blockchain;
+    this.isCentralNode = signalSocket.isCentralNode;
 
     net
       .createServer(socket => {
         this.onSocketConnected(socket);
       })
       .listen(port, () => {
-        if (signalSocket.isCentralNode) {
+        if (this.isCentralNode) {
           this.signalSocket.server(this.signature, 'localhost', port);
+          this.events = [Events.START_BLOCKCHAIN];
         } else {
           this.signalSocket.client(this.signature, 'localhost', port, this);
         }
@@ -55,25 +61,29 @@ export class Peer {
   }
 
   onData(socket: net.Socket, data: any) {
-    const json = data.toString();
-    const payload = JSON.parse(json);
+    const json = JSON.parse(data.toString());
 
     // if the message is from this node or already received ignore
-    if (
-      this.signature === payload.signature ||
-      this.receivedMessages.includes(payload.signature)
-    )
-      return;
+    if (this.signature === json.signature) return;
+
+    const event = this.events.find(n => n === json.event);
+    if (!event) {
+      if (json.event === Events.START_BLOCKCHAIN) {
+        this.blockchain.rebuild(json.payload, json.config);
+        this.events.push(Events.START_BLOCKCHAIN);
+      }
+    }
 
     // change it to a map to keep the content with the hash
-    this.receivedMessages.push(payload.signature);
-    console.log(`Data received: ${JSON.stringify(payload)}`);
+    // this.receivedMessages.push(json.signature);
+    console.log(`Data received: ${JSON.stringify(json)}`);
   }
 
   onConnection(socket: net.Socket) {
     socket.write(
       JSON.stringify({
         signature: this.signature,
+        event: Events.START_BLOCKCHAIN,
         payload: this.blockchain.show(),
         config: this.blockchain.getConfig()
       })
