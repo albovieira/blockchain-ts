@@ -51,7 +51,7 @@ export class BlockChain {
     return this;
   }
 
-  addTransaction(transaction: Transaction): BlockChain {
+  createTransaction(transaction: Transaction): BlockChain {
     if (this.getAddressBalance(transaction.fromAddress) < transaction.amount)
       throw new Error('Insuficient founds');
 
@@ -61,14 +61,17 @@ export class BlockChain {
     if (!transaction.isValid())
       throw new Error('Transactions must be valid to chain');
 
-    this.pendingTransactions.push(transaction);
-
     return this;
   }
 
   /** it adds reward for firsts wallets */
   addRewardTransaction(address: string): BlockChain {
     this.minePendingTransactions(address);
+    return this;
+  }
+
+  addPendingTransaction(transaction: Transaction) {
+    this.pendingTransactions.push(transaction);
     return this;
   }
 

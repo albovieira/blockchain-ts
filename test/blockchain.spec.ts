@@ -35,15 +35,17 @@ describe('Blockchain', () => {
 
     const tx1 = new Transaction(fromPublickKey, toPublickKey, 5);
     tx1.sign(fromPrivateKey);
-    blockchain.addTransaction(tx1);
+    blockchain.createTransaction(tx1);
 
     const tx2 = new Transaction(fromPublickKey, toPublickKey, 2);
     tx2.sign(fromPrivateKey);
-    blockchain.addTransaction(tx2);
+    blockchain.createTransaction(tx2);
 
     const tx3 = new Transaction(fromPublickKey, toPublickKey, 1);
     tx3.sign(fromPrivateKey);
-    blockchain.addTransaction(tx3);
+    blockchain.createTransaction(tx3);
+
+    [tx1, tx2, tx3].map(tx => blockchain.addPendingTransaction(tx));
 
     blockchain.minePendingTransactions(rewardPublickKey);
 
@@ -65,7 +67,7 @@ describe('Blockchain', () => {
     tx1.sign(fromPrivateKey);
 
     try {
-      blockchain.addTransaction(tx1);
+      blockchain.createTransaction(tx1);
     } catch (error) {
       expect(error.message).to.be.eq('Insuficient founds');
     }

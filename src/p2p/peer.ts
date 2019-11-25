@@ -1,10 +1,8 @@
 import * as net from 'net';
 import { SignalSocket } from './signal-socket';
 import { BlockChain } from '../lib/blockchain';
-
-enum Events {
-  START_BLOCKCHAIN = 'START_BLOCKCHAIN'
-}
+import { Events } from '../models/types';
+import { Transaction } from '../lib/transaction';
 
 export class Peer {
   private blockchain: BlockChain;
@@ -66,11 +64,24 @@ export class Peer {
     // if the message is from this node or already received ignore
     if (this.signature === json.signature) return;
 
+    //@fixme -> refactor events to a specific class
     const event = this.events.find(n => n === json.event);
     if (!event) {
       if (json.event === Events.START_BLOCKCHAIN) {
         this.blockchain.rebuild(json.payload, json.config);
         this.events.push(Events.START_BLOCKCHAIN);
+      }
+    }
+
+    if (json.event === Events.ADD_TRANSACTION) {
+      const eventName = `${json.event}_${json.signature}`;
+      const event = this.events.find(n => n === eventName);
+      if (!event) {
+        this.blockchain.addPendingTransaction(json.payload as Transaction);
+
+        //@todo:// need add more transactions before create blocks
+        this.blockchain.minePendingTransactions(process.env.WALLET_REWARD);
+        this.events.push(eventName);
       }
     }
 

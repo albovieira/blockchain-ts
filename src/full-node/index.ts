@@ -6,6 +6,7 @@ import { Peer } from '../p2p/peer';
 import { createSignature, getSignalSocket } from '../p2p/utils';
 import { WalletGenerator } from '../lib/wallet-generator';
 import { BlockChain } from '../lib/blockchain';
+import { Transaction } from '../lib/transaction';
 
 config();
 
@@ -19,6 +20,7 @@ const signature = createSignature(port);
 const isCentralNode = true;
 const io = getSignalSocket(socketIOPort, isCentralNode);
 
+// recuperar do banco
 const blockchain = new BlockChain(true, 2, 10);
 const peer = new Peer(blockchain, port, signature, {
   io,
@@ -40,6 +42,32 @@ server.post('/blockchain/start', (req, res) => {
   wallets.forEach(wallet => {
     blockchain.addRewardTransaction(wallet);
   });
+  res.send(true);
+});
+
+server.post('/blockchain/transaction', (req, res) => {
+  console.log(`start transaction`);
+  const { fromPrivateKey, from, to, amount } = req.body;
+
+  const fromBalance = blockchain.getAddressBalance(from);
+
+  if (fromPrivateKey) {
+    throw new Error('Private Key not informed');
+  }
+  if (fromBalance < amount) {
+    throw new Error('Insuficient balance');
+  }
+
+  const tx1 = new Transaction(from, to, 5);
+  tx1.sign(fromPrivateKey);
+  blockchain.createTransaction(tx1);
+
+  peer.broadcast({
+    signature: tx1.signature,
+    event: `ADD_TRANSACTION`,
+    payload: tx1
+  });
+
   res.send(true);
 });
 
