@@ -63,7 +63,7 @@ server.post('/blockchain/transaction', (req, res) => {
   blockchain.createTransaction(tx1);
 
   peer.broadcast({
-    signature: tx1.signature,
+    signature: peer.signature,
     event: `ADD_TRANSACTION`,
     payload: tx1
   });

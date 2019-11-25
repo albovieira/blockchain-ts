@@ -5,8 +5,8 @@ import { Events } from '../models/types';
 import { Transaction } from '../lib/transaction';
 
 export class Peer {
+  readonly signature: string;
   private blockchain: BlockChain;
-  private signature: string;
   private connections: net.Socket[] = [];
   private signalSocket: SignalSocket;
   private isCentralNode: boolean;
@@ -74,7 +74,7 @@ export class Peer {
     }
 
     if (json.event === Events.ADD_TRANSACTION) {
-      const eventName = `${json.event}_${json.signature}`;
+      const eventName = `${json.event}_${json.payload.signature}`;
       const event = this.events.find(n => n === eventName);
       if (!event) {
         this.blockchain.addPendingTransaction(json.payload as Transaction);
