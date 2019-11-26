@@ -19,7 +19,6 @@ Next steps:
 
 ```sh
 $ npm install
-$ npm start
 ```
 
 ### Test
