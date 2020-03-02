@@ -7,7 +7,7 @@ Flow:
 
 - Creation of signed wallets;
 - Balance Check;
-- Every transaction is signed before be created in blockchain;
+- Every transaction is signed before be created into blockchain;
 - There is a prof of work algorithm and a reward system to compensate the effort to generate a block;
 
 Next steps:
